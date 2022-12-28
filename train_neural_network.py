@@ -56,7 +56,7 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
 
 def main() -> None:
     """
-    Load an AI from a .pt file, train it, and overwrite the .pt file with the trained AI
+    Load a neural network from a .pt file, train it, and overwrite the .pt file with the trained neural network
 
     :return: None
     """

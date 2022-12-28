@@ -46,6 +46,7 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
 
 def main() -> None:
     """
+    Load a neural network from a .pt file and test the accuracy of its predictions.
 
     :return: None
     """
