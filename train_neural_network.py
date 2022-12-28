@@ -1,11 +1,10 @@
 from torch import save, load
 from torch.utils.data import DataLoader
-from torch.jit import trace
 from argparse import ArgumentParser, RawTextHelpFormatter
 from torch import nn, optim
 from torchvision import datasets, transforms
 from os.path import isdir, isfile
-from time import perf_counter
+from time import process_time
 from logging import info, DEBUG, getLogger, StreamHandler
 from sys import stdout
 from math import floor
@@ -28,7 +27,7 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
     :return: None
     """
     optimizer = optim.SGD(neural_network_model.parameters(), lr=0.003, momentum=0.9)
-    start = perf_counter()
+    start = process_time()
     for e in range(epochs):
         running_loss = 0
         for images, labels in training_data:
@@ -50,17 +49,15 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
             running_loss += loss.item()
         else:
             info(f"Epoch {e} - Training loss: {running_loss / len(training_data)}")
-    end = perf_counter()
+    end = process_time()
     duration_min = floor((end - start) / 60)
     duration_sec = end - start - duration_min * 60
-    info(f"Training duration = {duration_min} minutes and {duration_sec} seconds")
+    info(f"Training duration: {duration_min} minutes and {duration_sec} seconds")
 
 
 def main() -> None:
     """
     Load an AI from a .pt file, train it, and overwrite the .pt file with the trained AI
-
-    TODO: Restructure script using TorchScript and PyTorch's JIT to speed up the script
 
     :return: None
     """
@@ -78,15 +75,26 @@ def main() -> None:
                              " E.g. C:\\folder\\AI.pt\n"
                              " Note that the .pt file extension isn't strictly required but\n"
                              " it's safer to include it anyway.")
+    parser.add_argument("Data_loading_subprocesses",
+                        help=" Number of subprocesses used when loading and training from the data")
+    parser.add_argument("pin_memory",
+                        help=" Set to True if you are using a GPU, otherwise set to False")
     args = parser.parse_args()
 
     if not isdir(args.MNIST_directory):
-        raise FileNotFoundError(f"""The directory {args.MNIST_directory} does not exist. \n Use the --help option
+        raise FileNotFoundError(f"""The directory {args.MNIST_directory} does not exist. Use the --help option
                                     to see the list of command line arguments.""")
 
     if not isfile(args.PATH_and_filename_of_AI):
-        raise FileNotFoundError(f"""The file {args.PATH_and_filename_of_AI} does not exist.\n 
-                                Use the --help option to see the list of command line arguments.""")
+        raise FileNotFoundError(f"""The file {args.PATH_and_filename_of_AI} does not exist. 
+                                    Use the --help option to see the list of command line arguments.""")
+
+    subprocesses = int(args.Data_loading_subprocesses)
+    if subprocesses < 0:
+        raise ValueError(f" The number of subprocesses must be greater than or equal to zero,"
+                         f" but is currently set to {subprocesses}")
+
+    pin_memory = bool(args.pin_memory)
 
     # Configure logger
     log = getLogger()
@@ -102,7 +110,7 @@ def main() -> None:
     # argument and referenced by several variables we declare. If the data is already downloaded, the installation
     # is skipped.
     train_set = datasets.MNIST(args.MNIST_directory, download=True, train=True, transform=transform)
-    train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
+    train_loader = DataLoader(train_set, batch_size=64, shuffle=True, num_workers=subprocesses, pin_memory=pin_memory)
 
     # Load neural network
     neural_network = load(args.PATH_and_filename_of_AI)
