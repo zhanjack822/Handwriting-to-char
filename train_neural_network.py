@@ -1,13 +1,12 @@
-from torch import save, load
-from torch.utils.data import DataLoader
 from argparse import ArgumentParser, RawTextHelpFormatter
-from torch import nn, optim
-from torchvision import datasets, transforms
-from os.path import isdir, isfile
-from time import process_time
-from logging import info, DEBUG, getLogger, StreamHandler
-from sys import stdout
+from logging import DEBUG, getLogger, info, StreamHandler
 from math import floor
+from os.path import isdir, isfile
+from sys import stdout
+from time import process_time
+from torch import load, nn, optim, save
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
 
 
 def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, criterion: nn.NLLLoss) -> None:

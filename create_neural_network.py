@@ -1,7 +1,6 @@
-from torch import save
 from argparse import ArgumentParser, RawTextHelpFormatter
-from torch import nn
 from os.path import isdir, split
+from torch import save, nn
 
 
 def neural_model(input_layer: int, hidden_layer_sizes: list, output_layer: int) -> nn.Sequential:

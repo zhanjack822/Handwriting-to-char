@@ -1,13 +1,12 @@
-from torch import exp, no_grad, load
-from torch.utils.data import DataLoader
 from argparse import ArgumentParser, RawTextHelpFormatter
-from torch import nn
-from torchvision import datasets, transforms
-from os.path import isdir, isfile
-from time import process_time
-from logging import info, DEBUG, getLogger, StreamHandler
-from sys import stdout
+from logging import DEBUG, getLogger, info, StreamHandler
 from math import floor
+from os.path import isdir, isfile
+from sys import stdout
+from time import process_time
+from torch import exp, load, nn, no_grad
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
 
 
 def evaluate_neural_network(neural_network_model: nn, control_data: datasets) -> None:
