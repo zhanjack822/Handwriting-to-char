@@ -53,7 +53,7 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
     end = perf_counter()
     duration_min = floor((end - start) / 60)
     duration_sec = end - start - duration_min * 60
-    info(f"Training Time = {duration_min} minutes and {duration_sec} seconds")
+    info(f"Training duration = {duration_min} minutes and {duration_sec} seconds")
 
 
 def main() -> None:
