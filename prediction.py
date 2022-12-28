@@ -8,6 +8,7 @@ from os.path import isdir, isfile
 from time import perf_counter
 from logging import info, DEBUG, getLogger, StreamHandler
 from sys import stdout
+from math import floor
 
 
 def evaluate_neural_network(neural_network_model: nn, control_data: datasets) -> None:
@@ -18,7 +19,7 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
     :param neural_network_model:
     :return: None
     """
-
+    start = perf_counter()
     correct_count, all_count = 0, 0
     for images, labels in control_data:
         for i in range(len(labels)):
@@ -39,6 +40,10 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
 
     info(f"Number Of Images Tested = {all_count}")
     info(f"Model Accuracy = {correct_count / all_count}")
+    end = perf_counter()
+    duration_min = floor((end - start) / 60)
+    duration_sec = end - start - duration_min * 60
+    info(f"Training Time = {duration_min} minutes and {duration_sec} seconds")
 
 
 def main() -> None:
