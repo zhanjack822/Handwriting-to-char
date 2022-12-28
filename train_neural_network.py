@@ -82,12 +82,12 @@ def main() -> None:
     args = parser.parse_args()
 
     if not isdir(args.MNIST_directory):
-        raise FileNotFoundError(f"""The directory {args.MNIST_directory} does not exist. Use the --help option
-                                    to see the list of command line arguments.""")
+        raise FileNotFoundError(f" The directory {args.MNIST_directory} does not exist.\n "
+                                f" Use the --help option to see the list of command line arguments.")
 
     if not isfile(args.PATH_and_filename_of_AI):
-        raise FileNotFoundError(f"""The file {args.PATH_and_filename_of_AI} does not exist. 
-                                    Use the --help option to see the list of command line arguments.""")
+        raise FileNotFoundError(f" The file {args.PATH_and_filename_of_AI} does not exist.\n" 
+                                f" Use the --help option to see the list of command line arguments.")
 
     subprocesses = int(args.Data_loading_subprocesses)
     if subprocesses < 0:

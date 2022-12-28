@@ -52,8 +52,8 @@ def main() -> None:
 
     directory, filename = split(args.PATH_and_filename_of_AI)
     if not isdir(directory):
-        raise FileNotFoundError(f"""The directory {directory} does not exist.\n 
-                                Use the --help option to see the list of command line arguments.""")
+        raise FileNotFoundError(f" The directory {directory} does not exist.\n"
+                                f" Use the --help option to see the list of command line arguments.")
 
     # Define layer details and initialize the neural network
     input_size = 784
