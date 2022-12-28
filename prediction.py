@@ -1,6 +1,6 @@
+import torch.jit
 from torch import exp, no_grad, load
 from torch.utils.data import DataLoader
-from torch.jit import trace
 from argparse import ArgumentParser, RawTextHelpFormatter
 from torch import nn
 from torchvision import datasets, transforms
@@ -43,7 +43,7 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
     end = perf_counter()
     duration_min = floor((end - start) / 60)
     duration_sec = end - start - duration_min * 60
-    info(f"Training Time = {duration_min} minutes and {duration_sec} seconds")
+    info(f"Test duration = {duration_min} minutes and {duration_sec} seconds")
 
 
 def main() -> None:
