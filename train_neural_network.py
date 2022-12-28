@@ -1,40 +1,14 @@
-from torch import save
+from torch import save, load
 from torch.utils.data import DataLoader
 from torch.jit import trace
 from argparse import ArgumentParser, RawTextHelpFormatter
 from torch import nn, optim
 from torchvision import datasets, transforms
-from os.path import isdir, split
+from os.path import isdir, isfile
 from time import perf_counter
 from logging import info, DEBUG, getLogger, StreamHandler
 from sys import stdout
 from math import floor
-
-
-def neural_model(input_layer: int, hidden_layer_sizes: list, output_layer: int) -> nn.Sequential:
-    """
-    Initialize the neural network with four layers of neurons and the size of each layer is defined by
-    the function parameters
-
-    :param input_layer: The size of the first layer of neurons
-    :param hidden_layer_sizes: The size of the two "hidden layers" of neurons between the input and output layers
-    :param output_layer: The size of the output layer of neurons
-    :return: model - a container for several neural network models which will cumulatively form the machine learning
-    algorithm
-    :raise ValueError: The number of elements in hidden_sizes isn't two
-    """
-
-    if len(hidden_layer_sizes) != 2:
-        raise ValueError(f"Expected hidden_sizes to be a list with two elements, received {len(hidden_layer_sizes)}")
-
-    model = nn.Sequential(nn.Linear(input_layer, hidden_layer_sizes[0]),
-                          nn.ReLU(),
-                          nn.Linear(hidden_layer_sizes[0], hidden_layer_sizes[1]),
-                          nn.ReLU(),
-                          nn.Linear(hidden_layer_sizes[1], output_layer),
-                          nn.LogSoftmax(dim=1))
-
-    return model
 
 
 def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, criterion: nn.NLLLoss) -> None:
@@ -84,7 +58,7 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
 
 def main() -> None:
     """
-    Create a trained neural network AI, serialize it, and save it to the root directory of the project.
+    Load an AI from a .pt file, train it, and overwrite the .pt file with the trained AI
 
     TODO: Restructure script using TorchScript and PyTorch's JIT to speed up the script
 
@@ -100,7 +74,7 @@ def main() -> None:
                              " is located. If the dataset hasn't been downloaded yet,\n"
                              " this is the directory where the data will be installed in.")
     parser.add_argument("PATH_and_filename_of_AI",
-                        help=" PATH with the file name of the serialized AI being generated.\n"
+                        help=" PATH with the file name of the serialized AI being trained.\n"
                              " E.g. C:\\folder\\AI.pt\n"
                              " Note that the .pt file extension isn't strictly required but\n"
                              " it's safer to include it anyway.")
@@ -110,10 +84,9 @@ def main() -> None:
         raise FileNotFoundError(f"""The directory {args.MNIST_directory} does not exist. \n Use the --help option
                                     to see the list of command line arguments.""")
 
-    directory, filename = split(args.PATH_and_filename_of_AI)
-    if not isdir(directory):
-        raise FileNotFoundError(f"""The directory {directory} does not exist. \n Use the --help option
-                                    to see the list of command line arguments.""")
+    if not isfile(args.PATH_and_filename_of_AI):
+        raise FileNotFoundError(f"""The file {args.PATH_and_filename_of_AI} does not exist.\n 
+                                Use the --help option to see the list of command line arguments.""")
 
     # Configure logger
     log = getLogger()
@@ -131,12 +104,8 @@ def main() -> None:
     train_set = datasets.MNIST(args.MNIST_directory, download=True, train=True, transform=transform)
     train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
 
-    # Layer details for the neural network
-    input_size = 784
-    hidden_sizes = [128, 64]
-    output_size = 10
-
-    neural_network = neural_model(input_size, hidden_sizes, output_size)
+    # Load neural network
+    neural_network = load(args.PATH_and_filename_of_AI)
 
     # The cross entropy loss of a neural network is its error or accuracy, and ranges from 0 to 1, with 0 being a
     # perfectly accurate model while a 1 is always wrong. In order to train the AI, we need to define the loss of the
@@ -147,7 +116,7 @@ def main() -> None:
     epochs = 15
     nn_training(epochs, neural_network, train_loader, criterion)
 
-    # Serialize trained AI after training
+    # Overwrite serialized AI with trained AI
     save(neural_network, args.PATH_and_filename_of_AI)
 
 
