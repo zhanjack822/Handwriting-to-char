@@ -1,11 +1,10 @@
-import torch.jit
 from torch import exp, no_grad, load
 from torch.utils.data import DataLoader
 from argparse import ArgumentParser, RawTextHelpFormatter
 from torch import nn
 from torchvision import datasets, transforms
 from os.path import isdir, isfile
-from time import perf_counter
+from time import process_time
 from logging import info, DEBUG, getLogger, StreamHandler
 from sys import stdout
 from math import floor
@@ -19,7 +18,7 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
     :param neural_network_model:
     :return: None
     """
-    start = perf_counter()
+    start = process_time()
     correct_count, all_count = 0, 0
     for images, labels in control_data:
         for i in range(len(labels)):
@@ -40,10 +39,10 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
 
     info(f"Number Of Images Tested = {all_count}")
     info(f"Model Accuracy = {correct_count / all_count}")
-    end = perf_counter()
+    end = process_time()
     duration_min = floor((end - start) / 60)
     duration_sec = end - start - duration_min * 60
-    info(f"Test duration = {duration_min} minutes and {duration_sec} seconds")
+    info(f"Test duration: {duration_min} minutes and {duration_sec} seconds")
 
 
 def main() -> None:
@@ -65,6 +64,10 @@ def main() -> None:
                              " E.g. C:\\folder\\AI.pt\n"
                              " Note that the .pt file extension isn't strictly required but\n"
                              " it's safer to include it anyway.")
+    parser.add_argument("Data_loading_subprocesses",
+                        help=" Number of subprocesses used when loading and training from the data")
+    parser.add_argument("pin_memory",
+                        help=" Set to True if you are using a GPU, otherwise set to False")
     args = parser.parse_args()
 
     # Define a transform to normalize the data
@@ -75,9 +78,17 @@ def main() -> None:
     if not isdir(args.MNIST_directory):
         raise FileNotFoundError(f"""The directory {args.MNIST_directory} does not exist. \n Use the --help option
                                     to see the list of command line arguments.""")
+
     if not isfile(args.PATH_and_filename_of_AI):
         raise FileNotFoundError(f"""The file {args.PATH_to_serialized_AI} does not exist. \n Use the --help option
                                     to see the list of command line arguments.""")
+
+    subprocesses = int(args.Data_loading_subprocesses)
+    if subprocesses < 0:
+        raise ValueError(f" The number of subprocesses must be greater than or equal to zero,"
+                         f" but is currently set to {subprocesses}")
+
+    pin_memory = bool(args.pin_memory)
 
     # Configure logger
     log = getLogger()
@@ -89,7 +100,7 @@ def main() -> None:
 
     # Define datasets for testing efficacy of trained AI
     val_set = datasets.MNIST(args.MNIST_directory, download=True, train=False, transform=transform)
-    val_loader = DataLoader(val_set, batch_size=64, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=64, shuffle=True, num_workers=subprocesses, pin_memory=pin_memory)
     evaluate_neural_network(neural_network, val_loader)
 
 
