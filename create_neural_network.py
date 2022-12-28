@@ -1,5 +1,4 @@
 from torch import save
-from torch.jit import trace
 from argparse import ArgumentParser, RawTextHelpFormatter
 from torch import nn
 from os.path import isdir, split
