@@ -8,6 +8,7 @@ from os.path import isdir, split
 from time import perf_counter
 from logging import info, DEBUG, getLogger, StreamHandler
 from sys import stdout
+from math import floor
 
 
 def neural_model(input_layer: int, hidden_layer_sizes: list, output_layer: int) -> nn.Sequential:
@@ -39,7 +40,11 @@ def neural_model(input_layer: int, hidden_layer_sizes: list, output_layer: int) 
 def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, criterion: nn.NLLLoss) -> None:
     """
     This function trains the neural network over several epochs using some training data and a criterion for
-    evaluating the neural network's accuracy in its predictions.
+    evaluating the neural network's accuracy in its predictions. Since the function is passed a reference
+    (i.e. a pointer) to the neural network which is mutable, the neural network object outside the scope of
+    this function is altered as the neural_network_model object within the function scope is altered per
+    iteration of the training loop, so this function doesn't need to return a new object assigned to the
+    trained neural network.
 
     :param epochs: The number of iterations used to train the neural network
     :param training_data: The dataset used to train the neural network
@@ -72,8 +77,9 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
         else:
             info(f"Epoch {e} - Training loss: {running_loss / len(training_data)}")
     end = perf_counter()
-    duration = (end - start) / 60  # in minutes
-    info(f"Training Time (in minutes) = {duration}")
+    duration_min = floor((end - start) / 60)
+    duration_sec = end - start - duration_min * 60
+    info(f"Training Time = {duration_min} minutes and {duration_sec} seconds")
 
 
 def main() -> None:
