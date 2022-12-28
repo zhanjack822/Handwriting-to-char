@@ -1,4 +1,4 @@
-from torch import exp, no_grad, save
+from torch import save
 from torch.utils.data import DataLoader
 from torch.jit import trace
 from argparse import ArgumentParser, RawTextHelpFormatter
@@ -74,37 +74,6 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
     end = perf_counter()
     duration = (end - start) / 60  # in minutes
     info(f"Training Time (in minutes) = {duration}")
-
-
-def evaluate_neural_network(neural_network_model: nn, control_data: datasets) -> None:
-    """
-    This function logs the accuracy of the neural network's predictions against some set of control data
-
-    :param control_data:
-    :param neural_network_model:
-    :return: None
-    """
-
-    correct_count, all_count = 0, 0
-    for images, labels in control_data:
-        for i in range(len(labels)):
-            img = images[i].view(1, 784)
-
-            # Turn off gradients to speed up this part
-            with no_grad():
-                log_ps = neural_network_model(img)
-
-            # Output of the network are log-probabilities, need to take exponential for probabilities
-            ps = exp(log_ps)
-            probability = list(ps.numpy()[0])
-            prediction_label = probability.index(max(probability))
-            true_label = labels.numpy()[i]
-            if true_label == prediction_label:
-                correct_count += 1
-            all_count += 1
-
-    info(f"Number Of Images Tested = {all_count}")
-    info(f"Model Accuracy = {correct_count / all_count}")
 
 
 def main() -> None:
