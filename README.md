@@ -1,5 +1,6 @@
 # Handwriting-to-char
-This neural network will be trained using the MNIST dataset of handwriting images. To test the efficacy of the trained AI, it will be shown images of Nav Brar's handwriting with the goal of being able to display the correct text. 
+This neural network will be trained using the MNIST dataset of handwriting images. To test the efficacy of the trained 
+AI, it will be tested with handwritten work volunteered from UW students.
 
 ## [License](https://github.com/zhanjack822/Handwriting-to-char/blob/master/LICENSE)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
