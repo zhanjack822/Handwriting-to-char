@@ -7,7 +7,7 @@ This neural network will be trained using the MNIST dataset of handwriting image
 ```
     Handwriting-to-char is a machine learning AI that generates digital text 
     from images of handwriting
-    Copyright (C) 2022  (Jack) Kuei Hung Zhang, Josh Kazi
+    Copyright (C) 2022 (Jack) Kuei Hung Zhang, Josh Kazi
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
