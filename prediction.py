@@ -3,7 +3,7 @@ from logging import DEBUG, getLogger, info, StreamHandler
 from math import floor
 from os.path import isdir, isfile
 from sys import stdout
-from time import process_time
+from time import perf_counter, process_time
 from torch import exp, load, nn, no_grad
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
@@ -17,7 +17,9 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
     :param neural_network_model:
     :return: None
     """
-    start = process_time()
+
+    start_elapsed = perf_counter()
+    start_process = process_time()
     correct_count, all_count = 0, 0
     for images, labels in control_data:
         for i in range(len(labels)):
@@ -38,10 +40,12 @@ def evaluate_neural_network(neural_network_model: nn, control_data: datasets) ->
 
     info(f"Number Of Images Tested = {all_count}")
     info(f"Model Accuracy = {correct_count / all_count}")
-    end = process_time()
-    duration_min = floor((end - start) / 60)
-    duration_sec = end - start - duration_min * 60
-    info(f"Test duration: {duration_min} minutes and {duration_sec} seconds")
+    end_elapsed = perf_counter()
+    end_process = process_time()
+    elapsed_time = end_elapsed - start_elapsed  # in seconds
+    processor_time = end_process - start_process  # in seconds
+    info(f"Training elapsed time: {floor(elapsed_time / 60)} minutes and {elapsed_time % 60} seconds")
+    info(f"Training processor time: {floor(processor_time / 60)} minutes and {processor_time % 60} seconds")
 
 
 def main() -> None:
