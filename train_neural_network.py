@@ -5,6 +5,7 @@ from os.path import isdir, isfile
 from sys import stdout
 from time import perf_counter, process_time
 from torch import load, nn, optim, save
+from torch.cuda import is_available
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
@@ -29,31 +30,61 @@ def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, 
     optimizer = optim.SGD(neural_network_model.parameters(), lr=0.003, momentum=0.9)
     start_elapsed = perf_counter()
     start_process = process_time()
-    for e in range(epochs):
-        running_loss = 0
-        for images, labels in training_data:
-            # Flatten MNIST images into a one dimensional array
-            images = images.view(images.shape[0], -1)
+    # Use the GPU for storing tensors if possible
+    if is_available():
+        info("GPU used")
+        for e in range(epochs):
+            running_loss = 0
+            for images, labels in training_data:
+                # move images and labels to GPU
+                images, labels = images.cuda(), labels.cuda()
 
-            # Training pass
-            optimizer.zero_grad()
+                # Flatten MNIST images into a one dimensional array
+                images = images.view(images.shape[0], -1)
 
-            output = neural_network_model(images)
-            loss = criterion(output, labels)
+                # Training pass
+                optimizer.zero_grad()
 
-            # This is where the model learns by back-propagating
-            loss.backward()
+                output = neural_network_model(images)
+                loss = criterion(output, labels)
 
-            # And optimizes its weights here
-            optimizer.step()
+                # This is where the model learns by back-propagating
+                loss.backward()
 
-            running_loss += loss.item()
-        else:
-            info(f"Epoch {e} - Training loss: {running_loss / len(training_data)}")
+                # And optimizes its weights here
+                optimizer.step()
+
+                running_loss += loss.item()
+            else:
+                info(f"Epoch {e} - Training loss: {running_loss / len(training_data)}")
+
+    else:
+        info("CPU used")
+        for e in range(epochs):
+            running_loss = 0
+            for images, labels in training_data:
+                # Flatten MNIST images into a one dimensional array
+                images = images.view(images.shape[0], -1)
+
+                # Training pass
+                optimizer.zero_grad()
+
+                output = neural_network_model(images)
+                loss = criterion(output, labels)
+
+                # This is where the model learns by back-propagating
+                loss.backward()
+
+                # And optimizes its weights here
+                optimizer.step()
+
+                running_loss += loss.item()
+            else:
+                info(f"Epoch {e} - Training loss: {running_loss / len(training_data)}")
     end_elapsed = perf_counter()
     end_process = process_time()
-    elapsed_time = end_elapsed - start_elapsed # in seconds
-    processor_time = end_process - start_process # in seconds
+    elapsed_time = end_elapsed - start_elapsed  # in seconds
+    processor_time = end_process - start_process  # in seconds
     info(f"Training elapsed time: {floor(elapsed_time / 60)} minutes and {elapsed_time % 60} seconds")
     info(f"Training processor time: {floor(processor_time / 60)} minutes and {processor_time % 60} seconds")
 
