@@ -8,6 +8,7 @@ from torch import load, nn, optim, save
 from torch.cuda import is_available
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
+from pyjion import enable as pyjion_enable
 
 
 def nn_training(epochs: int, neural_network_model: nn, training_data: datasets, criterion: nn.NLLLoss) -> None:
@@ -120,7 +121,7 @@ def main() -> None:
                                 f" Use the --help option to see the list of command line arguments.")
 
     if not isfile(args.PATH_and_filename_of_AI):
-        raise FileNotFoundError(f" The file {args.PATH_and_filename_of_AI} does not exist.\n" 
+        raise FileNotFoundError(f" The file {args.PATH_and_filename_of_AI} does not exist.\n"
                                 f" Use the --help option to see the list of command line arguments.")
 
     subprocesses = int(args.Data_loading_subprocesses)
@@ -163,4 +164,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    pyjion_enable()
     main()
