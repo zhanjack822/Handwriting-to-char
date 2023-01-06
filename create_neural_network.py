@@ -36,7 +36,7 @@ def main() -> None:
     :return: None
     """
 
-    parser = ArgumentParser(prog="main",
+    parser = ArgumentParser(prog="create_neural_network",
                             description="Main neural network training script",
                             add_help=True,
                             formatter_class=RawTextHelpFormatter)
