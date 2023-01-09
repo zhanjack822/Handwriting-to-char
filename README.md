@@ -3,7 +3,7 @@ This neural network will be trained using the MNIST dataset of handwriting image
 AI, it will be tested with handwritten work volunteered from UW students.
 
 ## [License](https://github.com/zhanjack822/Handwriting-to-char/blob/master/LICENSE)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ```
     Handwriting-to-char is a machine learning AI that generates digital text 
